@@ -2,44 +2,50 @@
 
 > **🚧 Project Status:** Under Active Development
 
-A modular multimodal document loading framework built for LangChain applications. The project focuses on extracting structured information from complex documents such as PDFs, scanned documents, images, and Office files while preserving document semantics for Retrieval-Augmented Generation (RAG) and Agentic AI applications.
+Smart Document Loader is a modular, layout-aware document understanding framework built for LangChain applications. It transforms complex documents into high-quality semantic chunks for Retrieval-Augmented Generation (RAG), AI Agents, and enterprise document processing.
 
-Unlike traditional document loaders that only extract plain text, this project combines layout detection, OCR, figure understanding, table extraction, and semantic chunking to generate high-quality LangChain Documents.
+Unlike traditional document loaders that primarily extract plain text, Smart Document Loader combines layout detection, OCR, table extraction, figure understanding, semantic section building, and intelligent chunking while preserving the document's structural meaning.
 
 ## Features
 
 ### Custom Processing Pipeline
 
-* Digital PDF support
-* Scanned PDF support
-* Image document support
-* Microsoft Office document support (DOC, DOCX, PPT, PPTX, ODT, ODP)
-* Automatic Office to PDF conversion
-* Page rendering
-* Layout detection using DocLayout-YOLO
-* OCR-based text extraction
-* LLM-powered OCR correction
-* Figure understanding using Vision Language Models
-* Table extraction and reconstruction
-* Document cleaning
-* Section detection
-* Semantic chunk generation
+- Digital PDF support
+- Scanned PDF support
+- Image document support
+- Microsoft Office document support (DOC, DOCX, PPT, PPTX, ODT, ODP)
+- Automatic Office → PDF conversion
+- High-resolution page rendering
+- Layout detection using DocLayout-YOLO
+- OCR-based text extraction
+- LLM-powered OCR correction
+- Table extraction and reconstruction
+- Figure understanding using Vision Language Models
+- Formula extraction *(In Progress)*
+- Document cleaning and normalization
+- Reading order reconstruction
+- Section detection
+- Semantic chunk generation
 
 ### LangChain Integration
 
 Native support for:
 
-* TXT
-* Markdown
-* HTML
-* CSV
-* Excel
-* JSON / JSONL
-* XML
+- TXT
+- Markdown
+- HTML
+- CSV
+- Excel
+- JSON / JSONL
+- XML
 
-using LangChain document loaders and text splitters.
+All outputs are returned as standard LangChain `Document` objects.
+
+---
 
 ## Processing Pipeline
+
+### Custom Pipeline
 
 ```text
 Input Document
@@ -48,105 +54,156 @@ Input Document
 Document Loader
       │
       ▼
-Custom Pipeline / LangChain Pipeline
+Document Conversion (if required)
       │
       ▼
-Semantic Chunks
+Page Rendering
+      │
+      ▼
+Layout Detection
+      │
+      ▼
+Element Extraction
+      │
+      ▼
+OCR / Native Text Extraction
+      │
+      ▼
+Table & Figure Extraction
+      │
+      ▼
+Document Cleaning
+      │
+      ▼
+Reading Order Reconstruction
+      │
+      ▼
+Section Building
+      │
+      ▼
+Semantic Chunk Generation
       │
       ▼
 LangChain Documents
 ```
 
-## Current Project Structure
+### LangChain Pipeline
+
+```text
+Input Document
+      │
+      ▼
+LangChain Loader
+      │
+      ▼
+Text Splitter
+      │
+      ▼
+LangChain Documents
+```
+
+---
+
+## Project Structure
 
 ```text
 document_loader/
-├── loaders/
-├── extraction/
-├── layout/
-├── cleaner/
 ├── chunking/
-├── section_building/
+├── cleaner/
+├── extraction/
 ├── language_models/
 ├── langchain_processing/
+├── layout/
+├── loaders/
 ├── models/
-├── workspace.py
-├── config.py
-└── smart_document_loader.py
+├── reading_order/
+├── rendering/
+├── section_building/
+├── workspace/
+├── config/
+├── smart_document_loader.py
+└── __init__.py
 ```
+
+---
 
 ## Supported Document Types
 
 ### Custom Pipeline
 
-* PDF
-* PNG
-* JPG
-* JPEG
-* TIFF
-* DOC / DOCX
-* PPT / PPTX
-* ODT / ODP
+- PDF
+- PNG
+- JPG
+- JPEG
+- TIFF
+- BMP
+- WEBP
+- DOC / DOCX
+- PPT / PPTX
+- ODT / ODP
 
 ### LangChain Pipeline
 
-* TXT
-* Markdown
-* HTML
-* CSV
-* XLS / XLSX / ODS
-* JSON / JSONL
-* XML
+- TXT
+- Markdown
+- HTML
+- CSV
+- XLS / XLSX / ODS
+- JSON / JSONL
+- XML
+
+---
 
 ## Roadmap
 
 ### ✅ Completed
 
-* Smart Document Loader
-* PDF Loader
-* Image Loader
-* Office Document Support
-* Workspace Management
-* Page Rendering
-* Layout Detection
-* OCR Pipeline
-* Table Extraction
-* Figure Extraction
-* Document Cleaning
-* Section Builder
-* Semantic Chunk Builder
-* LangChain Integration
+- Modular Smart Document Loader
+- PDF, Image & Office Document Loaders
+- Workspace Management
+- Page Rendering
+- Layout Detection
+- OCR Pipeline
+- OCR Correction
+- Table Extraction
+- Figure Extraction
+- Document Cleaning
+- Reading Order Reconstruction
+- Section Builder
+- Semantic Chunk Builder
+- LangChain Integration
 
 ### 🚧 In Progress
 
-* Formula Extraction
-* Reading Order Optimization
-* Bounding Box Preservation
-* Improved Table Reconstruction
-* Performance Optimization
+- Formula Extraction
+- Bounding Box Preservation
+- Improved Table Reconstruction
+- Performance Optimization
 
 ### 📌 Planned
 
-* Visual Source Citation
-* Hybrid Retrieval Support
-* Database Integration
-* Batch Processing
-* Async Processing
-* LangGraph Integration
-* Evaluation Framework
-* Streaming Document Processing
+- Visual Source Citation
+- Batch & Async Processing
+- Streaming Document Processing
+- Hybrid Retrieval Support
+- LangGraph Integration
+- Evaluation Framework
+
+---
 
 ## Tech Stack
 
-* Python
-* LangChain
-* PyMuPDF
-* EasyOCR / PaddleOCR
-* DocLayout-YOLO
-* Hugging Face Transformers
-* Vision Language Models
-* Groq API
+- Python
+- LangChain
+- PyMuPDF
+- EasyOCR / PaddleOCR
+- DocLayout-YOLO
+- Hugging Face Transformers
+- Vision Language Models
+- Groq API
+
+---
 
 ## Goal
 
-The goal of this project is to provide a reusable, production-ready document ingestion framework capable of handling complex enterprise documents while seamlessly integrating with LangChain, vector databases, and modern LLM-based applications.
+The goal of Smart Document Loader is to provide a reusable, production-ready document understanding framework capable of handling complex documents while seamlessly integrating with LangChain, vector databases, and modern LLM-powered applications.
