@@ -109,20 +109,22 @@ CONFIG = {
 
             "figure_caption",
             "table_caption",
-            "formula_caption",
-
-            "formula",
-            "isolate_formula"
+            "formula_caption"
         ],
     },
 
-    # Elements requiring LLM descriptions
-    "generate_element_description": [
-        "formula",
-        "isolate_formula"
-    ],
-
     "table_cell_padding": 2, 
+    
+
+    # ==========================================================
+    # Formula Extracton Config
+    # ==========================================================
+    "formula_extraction": {
+        "formula_elements": [
+            "formula",
+            "isolate_formula"
+        ]
+    },
 
     # ==========================================================
     # Chunking

@@ -6,7 +6,6 @@ from ...data_models import *
 class FigureCaptioner:
 
     def __init__(self, vlm_service):
-
         self.vlm_service = vlm_service
 
 
@@ -60,7 +59,7 @@ class FigureCaptioner:
     def caption(self, image_path):
 
         try:
-            response = self.vlm_service.generate(
+            response = self.vlm_service.invoke(
                 image_path,
                 self._build_prompt()
             )

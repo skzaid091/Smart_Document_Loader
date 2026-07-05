@@ -15,7 +15,7 @@ class TextExtractor:
     depending on whether a text layer is available.
     """
 
-    def __init__(self, llm_service, ocr_config, text_element_types, generate_element_description):
+    def __init__(self, llm_service, ocr_config, text_element_types):
         """
         Initialize text extraction components.
         """
@@ -25,7 +25,7 @@ class TextExtractor:
 
         # Used for searchable PDFs containing
         # an embedded text layer.
-        self.pdf_text_extractor = PDFTextExtractor(llm_service, text_element_types, generate_element_description)
+        self.pdf_text_extractor = PDFTextExtractor(llm_service, text_element_types)
 
 
     def process(self, document):

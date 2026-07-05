@@ -12,9 +12,9 @@ class LangChainChunker:
 
         self.text_splitter = RecursiveCharacterTextSplitter(
 
-            chunk_size=chunking_config["chunk_size"],
+            chunk_size=chunking_config["target_chunk_size"],
 
-            chunk_overlap=chunking_config["chunk_overlap"],
+            chunk_overlap=chunking_config["overlap_size"],
 
             separators=chunking_config["separators"],
 

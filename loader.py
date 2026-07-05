@@ -30,6 +30,7 @@ from .page_renderrer import PageRenderer
 from .extraction.text_extractor import TextExtractor
 from .extraction.figure.figure_extractor import FigureExtractor
 from .extraction.table.table_extractor import TableExtractor
+from .extraction.formula.formula_extractor import FormulaExtractor
 
 from .cleaner.pre_element_cleaner import PreElementCleaner
 from .cleaner.document_cleaner import DocumentCleaner
@@ -88,7 +89,13 @@ class SmartDocumentLoader(Runnable[str, list]):
         list[langchain_core.documents.Document]
     """
 
-    def __init__(self, groq_api_key="", ocr_config=None):
+    def __init__(
+            self, 
+            groq_api_key="", 
+            target_chunk_size=None, 
+            min_chunk_size=None, 
+            overlap_size=None,
+        ):
         """
         Initialize the Smart Document Loader.
         """
@@ -101,6 +108,10 @@ class SmartDocumentLoader(Runnable[str, list]):
         # Merge user supplied OCR configuration with defaults.
         for key, value in CONFIG["ocr"].items():
             ocr_config.setdefault(key, value)
+        
+        CONFIG["chunking"]["target_chunk_size"] = target_chunk_size if target_chunk_size else CONFIG["chunking"]["target_chunk_size"]
+        CONFIG["chunking"]["min_chunk_size"] = min_chunk_size if min_chunk_size else CONFIG["chunking"]["min_chunk_size"]
+        CONFIG["chunking"]["overlap_size"] = overlap_size if overlap_size else CONFIG["chunking"]["overlap_size"]
 
         # Download required models and resources.
         download_prerequisites()
@@ -149,8 +160,7 @@ class SmartDocumentLoader(Runnable[str, list]):
         self.text_extractor = TextExtractor(
             self.llm_service,
             ocr_config,
-            CONFIG["layout_detection"]["text_element_types"],
-            CONFIG["generate_element_description"]
+            CONFIG["layout_detection"]["text_element_types"]
         )
 
         self.figure_extractor = FigureExtractor(
@@ -164,6 +174,15 @@ class SmartDocumentLoader(Runnable[str, list]):
             ocr_config,
             CONFIG["layout_detection"]["text_element_types"],
             CONFIG["table_cell_padding"]
+        )
+
+        self.formula_extractor = FormulaExtractor(
+            self.workspace, 
+            self.llm_service, 
+            self.vlm_service, 
+            CONFIG["formula_extraction"]["formula_elements"], 
+            ocr_config,
+            CONFIG["layout_detection"]["text_element_types"]
         )
 
         self.element_cleaner = PreElementCleaner(
@@ -193,9 +212,10 @@ class SmartDocumentLoader(Runnable[str, list]):
             self.element_cleaner.process,
             self.figure_extractor.process,
             self.table_extractor.process,
+            self.formula_extractor.process,
             self.document_cleaner.process,
-            self.section_builder.process,
-            self.chunk_builder.process,
+            # self.section_builder.process,
+            # self.chunk_builder.process,
         ]
 
 

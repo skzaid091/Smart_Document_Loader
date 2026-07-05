@@ -1,17 +1,19 @@
 from pathlib import Path
 
 import gdown
+from huggingface_hub import snapshot_download
 
 from config import CONFIG
 
 
-# Google Drive file ID for the trained DocLayout-YOLO model.
+# Google Drive file ID for the pretrained DocLayout-YOLO model.
 LAYOUT_MODEL_FILE_ID = "1jWADlbEukps--JX4Qves-qWW-cuc4OPz"
 
 
 def download_layout_model():
     """
-    Download the DocLayout-YOLO model if it is not already available.
+    Download the DocLayout-YOLO model if it is not already
+    available in the local models directory.
     """
 
     model_dir = Path(
@@ -46,7 +48,8 @@ def download_layout_model():
 
 def download_prerequisites():
     """
-    Download all required models and resources.
+    Download all models and resources required by the
+    document processing pipeline.
     """
 
     download_layout_model()

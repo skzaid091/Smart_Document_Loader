@@ -1,6 +1,4 @@
-import os
 import cv2
-from uuid import uuid4
 
 
 class FigureImageExtractor:
@@ -34,8 +32,6 @@ class FigureImageExtractor:
         """
 
         output_path = self.workspace.crop_path(document_id)
-
-        print("\nSaving to crop path : ", output_path)
 
         cv2.imwrite(output_path, crop)
 

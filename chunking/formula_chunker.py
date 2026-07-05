@@ -4,43 +4,84 @@ from langchain_core.documents import Document
 
 class FormulaChunker:
     """
-    Build retrievable chunks from formulas.
+    Build retrievable LangChain documents from formulas.
 
     Responsibilities:
-    - Convert formulas into chunks.
+    - Convert extracted formulas into semantic chunks.
     - Preserve section context.
     - Preserve page information.
-    - Create a single chunk per formula.
+    - Create one chunk per formula.
     """
 
     def __init__(self):
         self.formula_no = 1
 
 
+    def _build_content(self, formula_data, formula_no):
+        """
+        Convert structured formula information into text
+        suitable for embedding and retrieval.
+        """
+
+        parts = []
+
+        formula = getattr(formula_data, "formula", None)
+        explanation = getattr(formula_data, "explanation", None)
+
+        # -------------------------
+        # Formula Number
+        # -------------------------
+        if formula_no:
+            parts.append(f"Formula Number: {formula_no}")
+
+        # -------------------------
+        # Formula
+        # -------------------------
+        if formula and str(formula).strip():
+            parts.append(f"Formula: {formula}")
+
+        # -------------------------
+        # Explanation
+        # -------------------------
+        if explanation and str(explanation).strip():
+            parts.append(f"Explanation: {explanation}")
+
+        # -------------------------
+        # Fallback
+        # -------------------------
+        if not parts:
+            parts.append("Formula present. Description unavailable.")
+
+        return "\n\n".join(parts)
+
+
     def process(self, element, section, document_id, document_name):
         """
-        Create a chunk from a formula element.
+        Convert a formula element into a LangChain document.
 
-        Parameters:
-            element: Formula element.
+        Parameters
+        ----------
+        element
+            Formula document element.
 
-            section: Parent section.
+        section
+            Parent section containing the formula.
 
-        Returns:
-            List[DocumentChunk]
+        Returns
+        -------
+        list[Document]
+            A single LangChain document representing the formula.
         """
 
-        formula = (element.text or "").strip()
+        formula_data = element.formula_data
 
-        if not formula:
+        if not formula_data:
             return []
+        
+        content = self._build_content(formula_data, self.formula_no)
 
         chunk = Document(
-            page_content=(
-                f"Formula Number: {self.formula_no}\n\n"
-                f"Section: {section['title']}\n\n"
-                f"Formula:\n{formula}"
-            ),
+            page_content=content,
             metadata={
                 # Identification
                 "document_id": document_id,

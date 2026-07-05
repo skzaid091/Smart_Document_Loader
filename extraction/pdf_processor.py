@@ -13,14 +13,13 @@ class PDFTextExtractor:
     4. Populate DocumentElement.text.
     """
 
-    def __init__(self, llm_service, text_element_types, generate_element_description):
+    def __init__(self, llm_service, text_element_types):
         """
         Store application configuration.
         """
         self.text_llm_corrector = TextLLMCorrector(llm_service)
 
         self.text_element_types = text_element_types
-        self.generate_element_description = generate_element_description
 
 
     def _overlap_ratio(self, element_bbox, block_bbox):
@@ -108,10 +107,6 @@ class PDFTextExtractor:
         matched_blocks.sort(key=lambda item: item[0])
 
         return "\n".join(text for _, text in matched_blocks)
-    
-
-    def modify_element_text(self, element_text):
-        return self.text_llm_corrector.generate_formula_description(element_text)
 
 
     def process_page(self, document, page):
@@ -137,9 +132,5 @@ class PDFTextExtractor:
 
             element.text = self.extract(element, page)
 
-            if (element.element_type not in self.generate_element_description or not element.text):
-                continue
-
-            element.text = self.modify_element_text(element.text)
 
         return document

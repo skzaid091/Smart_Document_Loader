@@ -1,91 +1,36 @@
 class PostElementCleaner:
     """
-    Clean extracted document elements.
+    Perform generic cleanup on extracted document elements.
 
     Responsibilities:
     - Remove duplicate detections
-    - Remove invalid or empty elements
     - Normalize extracted text
     - Prepare elements for downstream processing
 
-    This stage converts raw extraction output
-    into a cleaner representation suitable for:
+    This stage operates only on the raw extraction output and
+    performs document-agnostic cleanup before later semantic
+    processing stages.
 
+    Typical pipeline:
+
+        Layout Detection
+                ↓
+              OCR
+                ↓
+        PostElementCleaner
+                ↓
         Reading Order Reconstruction
-                    ↓
-            Section Building
-                    ↓
-               Chunking
-                    ↓
-               Retrieval
+                ↓
+          Content Extraction
+                ↓
+            Data Cleaning
+                ↓
+          Section Building
+                ↓
+             Chunking
+                ↓
+             Retrieval
     """
-
-    def _is_valid_element(self, element):
-        """
-        Determine whether an element contains
-        useful retrievable information.
-
-        Valid elements include:
-
-        - Text elements containing content
-        - Tables containing extracted rows
-        - Figures containing an image path
-        - Figures with a valid caption
-
-        Returns:
-            bool
-        """
-
-        # ----------------------------------
-        # Text Elements
-        # ----------------------------------
-
-        text = getattr(element, "text", None)
-
-        if text:
-            text = str(text).strip()
-
-            # Ignore OCR artifacts such as:
-            # None
-            # ""
-            if text and text.lower() != "none":
-                return True
-
-        # ----------------------------------
-        # Table Elements
-        # ----------------------------------
-
-        table_data = getattr(element, "table_data", None)
-
-        if table_data:
-            rows = getattr(table_data, "rows", None)
-
-            # Keep table only if
-            # rows were extracted.
-            if rows:
-                return True
-
-        # ----------------------------------
-        # Figure Elements
-        # ----------------------------------
-
-        figure_data = getattr(element, "figure_data", None)
-
-        if figure_data:
-            # Prefer image existence.
-            image_path = getattr(figure_data, "image_path", None)
-
-            if image_path:
-                return True
-
-            # Fallback to caption.
-            caption = getattr(figure_data, "caption", None)
-
-            if (isinstance(caption, str) and caption.strip() and caption.lower() != "unknown"):
-                return True
-
-        return False
-
 
     def _normalize_text(self, document):
         """
@@ -185,31 +130,28 @@ class PostElementCleaner:
         Workflow:
 
             Raw Elements
-                  ↓
+                ↓
 
-          Duplicate Removal
-                  ↓
+        Duplicate Removal
+                ↓
 
-        Invalid Element Removal
-                  ↓
+        Text Normalization
+                ↓
 
-          Text Normalization
-                  ↓
-
-           Clean Elements
+        Clean Elements
 
         Steps:
 
-            1. Remove duplicate detections
-               using bounding-box overlap.
+            1. Remove duplicate detections using
+            bounding-box overlap.
 
-            2. Remove elements that contain
-               no useful retrievable data.
-
-            3. Normalize extracted text.
+            2. Normalize extracted text by removing
+            unnecessary whitespace while preserving
+            the original content.
 
         Returns:
-            Cleaned document.
+            Cleaned document with duplicate elements
+            removed and text normalized.
         """
 
         filtered = []
@@ -252,19 +194,6 @@ class PostElementCleaner:
                 filtered.append(element)
 
         document.elements = filtered
-
-        # ----------------------------------
-        # Remove invalid elements
-        # ----------------------------------
-
-        cleaned_elements = []
-
-        for element in document.elements:
-
-            if self._is_valid_element(element):
-                cleaned_elements.append(element)
-
-        document.elements = cleaned_elements
 
         # ----------------------------------
         # Normalize extracted text

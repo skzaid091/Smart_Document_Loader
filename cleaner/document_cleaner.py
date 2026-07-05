@@ -1,10 +1,11 @@
 from .post_element_cleaner import PostElementCleaner
 from .reading_order_builder import ReadingOrderBuilder
-from .figure_cleaner import FigureCleaner
+
+from .data_cleaner import DataCleaner
 from .metadata_cleaner import MetadataCleaner
 
 
-class   DocumentCleaner:
+class DocumentCleaner:
     """
     Final document post-processing pipeline.
 
@@ -35,7 +36,7 @@ class   DocumentCleaner:
         self.reading_order_builder = ReadingOrderBuilder()
 
         # Cleans and enriches figure metadata.
-        self.figure_cleaner = FigureCleaner()
+        self.data_cleaner = DataCleaner()
 
         # Cleans unnecessary metadata
         self.metadata_cleaner = MetadataCleaner()
@@ -70,7 +71,7 @@ class   DocumentCleaner:
 
         # Clean figure metadata and
         # prepare figures for retrieval.
-        document = self.figure_cleaner.process(document)
+        document = self.data_cleaner.process(document)
 
         # Cleans metadata
         document = self.metadata_cleaner.process(document)

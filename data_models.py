@@ -60,6 +60,21 @@ class FigureData:
 
 
 # ==========================================================
+# Formula Structures
+# ==========================================================
+
+@dataclass
+class FormulaData:
+    """
+    Structured representation of an extracted mathematical formula.
+    """
+
+    formula: str = ""
+    latex: str = ""
+    explanation: str = ""
+
+
+# ==========================================================
 # Page Structures
 # ==========================================================
 
@@ -118,6 +133,8 @@ class DocumentElement:
     table_data: Optional[TableData] = None
 
     figure_data: Optional[FigureData] = None
+
+    formula_data: Optional[FormulaData] = None
 
     metadata: Optional[dict] = None
 
