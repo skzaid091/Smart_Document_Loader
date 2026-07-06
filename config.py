@@ -1,8 +1,6 @@
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 
-print("BASE_DIR : ", BASE_DIR)
-
 CONFIG = {
 
     # -------------------------------------------------------------------------
@@ -61,10 +59,10 @@ CONFIG = {
         "enable_ocr_correction": True,
 
         # OCR engine.
-        "type": "EasyOCR",
+        "ocr_type": "EasyOCR",
 
         # OCR language(s).
-        "language": "en", 
+        "ocr_language": "en", 
 
         # Enable angle classification to automatically detect rotated text.
         "ocr_use_angle_cls": True

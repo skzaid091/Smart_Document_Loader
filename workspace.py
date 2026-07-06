@@ -54,7 +54,7 @@ class Workspace:
             (document_id, workspace_pdf_path)
         """
 
-        document_id = uuid4().hex
+        document_id = str(uuid4()).split('-')[-1]
 
         workspace = self.root_dir / document_id
 

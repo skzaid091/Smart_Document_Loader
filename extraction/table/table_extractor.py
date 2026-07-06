@@ -1,10 +1,10 @@
 from .table_image_extractor import TableImageExtractor
 from .tatr_extractor import TATRExtractor
-from extraction.ocr_processor import OCRProcessor
+from ...extraction.ocr_processor import OCRProcessor
 from .table_ocr import TableOCR
 from .table_data_builder import TableDataBuilder
 
-from extraction.ocr_correction.ocr_table_correction import TableLLMCorrector
+from ...extraction.ocr_correction.ocr_table_correction import TableLLMCorrector
 
 
 class TableExtractor:

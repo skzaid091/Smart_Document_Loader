@@ -1,9 +1,7 @@
+import gdown
 from pathlib import Path
 
-import gdown
-from huggingface_hub import snapshot_download
-
-from config import CONFIG
+from .config import CONFIG
 
 
 # Google Drive file ID for the pretrained DocLayout-YOLO model.

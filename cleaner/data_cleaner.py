@@ -44,7 +44,6 @@ class DataCleaner:
             elif element.element_type in ["formula", "isolate_formula"]:
 
                 if not element.formula_data:
-                    print("excaping ----------------------------------- element : ", element, "\n")
                     continue
 
             else:

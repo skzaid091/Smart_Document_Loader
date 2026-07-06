@@ -67,21 +67,14 @@ class FormulaImageExtractor:
         # Ignore invalid or empty crops.
         if crop.size == 0:
             return None
-        
-        print("FFFFFFFFFFFFFORMULA CROP SIZE : ", crop.size)
     
         formula_text = self.ocr_processor._extract_text(crop)
         if not formula_text:
-            print("Returned -----------------------------------------------------------------")
             return None
         
         formula_text = formula_text.strip().replace(" ", "").replace("\n", "")
-        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFF : ", formula_text)
         if re.fullmatch(r"\(?\d+\)?", formula_text):
-            print("Returned -----------------------------------------------------------------")
             return None
-        
-        print("\n")
 
         crop_path = self.save_crop_for_inspection(document_id, crop)
 

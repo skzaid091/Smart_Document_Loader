@@ -1,5 +1,4 @@
 from .formula_image_extractor import FormulaImageExtractor
-from .formula_recognizer import FormulaRecognizer
 from .vlm_formula_recognizer import VLMFormulaRecognizer
 
 
@@ -21,7 +20,6 @@ class FormulaExtractor:
         self.formula_elements = formula_elements
 
         self.formula_image_extractor = FormulaImageExtractor(workspace, llm_service, ocr_config, text_element_types)
-        self.formula_recognizer = FormulaRecognizer()
         self.vlm_based_formula_recognizer = VLMFormulaRecognizer(vlm_service)
 
 

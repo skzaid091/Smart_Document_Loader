@@ -92,6 +92,7 @@ class SmartDocumentLoader(Runnable[str, list]):
     def __init__(
             self, 
             groq_api_key="", 
+            ocr_config=None, 
             target_chunk_size=None, 
             min_chunk_size=None, 
             overlap_size=None,
@@ -214,8 +215,8 @@ class SmartDocumentLoader(Runnable[str, list]):
             self.table_extractor.process,
             self.formula_extractor.process,
             self.document_cleaner.process,
-            # self.section_builder.process,
-            # self.chunk_builder.process,
+            self.section_builder.process,
+            self.chunk_builder.process,
         ]
 
 
@@ -314,6 +315,8 @@ class SmartDocumentLoader(Runnable[str, list]):
 
         for step in self.custom_pipeline_steps:
             document = step(document)
+        
+        self.clean_up(document)
 
         return document
 
@@ -327,3 +330,13 @@ class SmartDocumentLoader(Runnable[str, list]):
         """
 
         return self.langchain_chunker.process(documents)
+
+
+    def clean_up(self, chunks):
+        try:
+            document_id = chunks[0].metadata.get("document_id", None)
+        except:
+            document_id = None
+
+        if document_id:
+            self.workspace.cleanup(document_id)

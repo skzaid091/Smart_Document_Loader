@@ -67,8 +67,6 @@ class VLMFormulaRecognizer(BaseFormulaRecognizer):
             prompt=prompt
         )
 
-        print("response : ", response, "\n")
-
         result = self.extract_json(response)
 
         return FormulaData(
