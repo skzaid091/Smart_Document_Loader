@@ -11,3 +11,5 @@ huggingface_hub==1.22.0
 transformers==5.12.1
 json_repair==0.61.2
 easyocr==1.7.2
+paddleocr==2.10.0
+paddlepaddle==2.6.2

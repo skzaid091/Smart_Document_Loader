@@ -52,7 +52,17 @@ class OCRProcessor:
 
         elif ocr_config["ocr_type"] == "PaddleOCR":
             from paddleocr import PaddleOCR
-            self.ocr = PaddleOCR(lang=ocr_config["ocr_language"], use_angle_cls=ocr_config["ocr_use_angle_cls"])
+            self.ocr = PaddleOCR(
+                det_model_dir=str(ocr_config["paddle_ocr"]["paddle_ocr_det_path"]),
+                rec_model_dir=str(ocr_config["paddle_ocr"]["paddle_ocr_rec_path"]),
+                cls_model_dir=str(ocr_config["paddle_ocr"]["paddle_ocr_cls_path"]),
+
+                use_angle_cls=ocr_config["ocr_use_angle_cls"],
+
+                lang="en",
+                ir_optim=True,
+                show_log=False
+            )
 
         else:
             raise ValueError(f"Unsupported OCR type:  {ocr_config['ocr_type']}")
@@ -107,10 +117,21 @@ class OCRProcessor:
 
 
     def _paddleocr(self, image):
-        """
-        Extract text using PaddleOCR.
-        """
-        pass
+        try:
+            results = self.ocr.ocr(image)[0]
+
+            if not results:
+                return ""
+            
+            result = []
+            for line in results:
+                result.append(line[1][0])
+
+            return "\n".join(result)
+
+        except Exception as e:
+            print(f"OCR failed: {e}")
+            return ""
 
 
     def _rapidocr(self, image):

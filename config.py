@@ -55,17 +55,47 @@ CONFIG = {
     # -------------------------------------------------------------------------
     "ocr": {
 
-        # Enable LLM-based OCR correction.
+        # Enable LLM-based post-processing to correct OCR mistakes
+        # such as spelling errors, merged words, or missing characters.
         "enable_ocr_correction": True,
 
-        # OCR engine.
+        # OCR engine to use.
+        # Supported: "EasyOCR", "PaddleOCR"
         "ocr_type": "EasyOCR",
 
-        # OCR language(s).
-        "ocr_language": "en", 
+        # Language used by the OCR engine.
+        # For multiple languages, provide a list if supported by the engine.
+        "ocr_language": "en",
 
-        # Enable angle classification to automatically detect rotated text.
-        "ocr_use_angle_cls": True
+        # Enable text angle classification to automatically detect
+        # and correct rotated or upside-down text before recognition.
+        "ocr_use_angle_cls": True,
+
+        # Base directory containing all OCR-related models.
+        "ocr_models_base_path": BASE_DIR / "models" / "ocr",
+
+        # PaddleOCR model configuration.
+        "paddle_ocr": {
+
+            # DBNet text detection model.
+            # Detects text regions and returns text polygons/bounding boxes.
+            "paddle_ocr_det_path":
+                BASE_DIR / "models" / "ocr" / "paddle_ocr"
+                / "det" / "en_PP-OCRv3_det_infer",
+
+            # Text recognition model (SVTR_LCNet).
+            # Recognizes the cropped text regions detected by DBNet.
+            "paddle_ocr_rec_path":
+                BASE_DIR / "models" / "ocr" / "paddle_ocr"
+                / "rec" / "en_PP-OCRv4_rec_infer",
+
+            # Text angle classification model.
+            # Predicts whether a text crop should be rotated
+            # (typically 0° or 180°) before recognition.
+            "paddle_ocr_cls_path":
+                BASE_DIR / "models" / "ocr" / "paddle_ocr"
+                / "cls" / "ch_ppocr_mobile_v2.0_cls_infer",
+        }
     },
 
     # -------------------------------------------------------------------------
