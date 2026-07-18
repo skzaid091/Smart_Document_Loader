@@ -1,8 +1,6 @@
 import os
-import shutil
 import pymupdf
 import subprocess
-from uuid import uuid4
 
 from ..data_models import *
 from .base_loader import BaseLoader
@@ -12,13 +10,15 @@ class PDFLoader(BaseLoader):
 
     def __init__(self, workspace):
         
-        self.worksapce = workspace
+        self.workspace = workspace
 
     
-    def load(self, path):
+    def load(self, path, converted_file=False):
         
-        file_name = os.path.basename(path)
-        document_id, path = self.worksapce.create(path)
+        if not converted_file:
+            path = self.workspace.save_document(path)
+            
+        document_id = self.workspace.create()
 
         try:
             # Open PDF using PyMuPDF.
@@ -29,8 +29,7 @@ class PDFLoader(BaseLoader):
                 metadata = {
                     "title": raw_metadata.get("title"),
                     "author": raw_metadata.get("author"),
-                    "subject": raw_metadata.get("subject"),
-                    "file_path": path
+                    "subject": raw_metadata.get("subject")
                 }
 
                 pages = []
@@ -66,7 +65,7 @@ class PDFLoader(BaseLoader):
                     document_id=document_id,
                     document_type="pdf",
 
-                    file_name=file_name,
+                    file_path=path,
                     metadata=metadata,
 
                     page_count=len(doc),
@@ -82,7 +81,7 @@ class PDFLoader(BaseLoader):
                 document_id=document_id,
                 document_type="pdf",
 
-                file_name=file_name,
+                file_path=path,
                 metadata={},
 
                 page_count=0,
@@ -162,9 +161,7 @@ class PDFLoader(BaseLoader):
             raise FileNotFoundError(f"File not found: {file_path}")
 
         file_name = os.path.basename(file_path)
-
-        output_dir = self.worksapce.root_dir
-        os.makedirs(output_dir, exist_ok=True)
+        output_dir = self.workspace.documents_dir
 
         try:
 
@@ -178,7 +175,7 @@ class PDFLoader(BaseLoader):
                     "pdf",
                     file_path,
                     "--outdir",
-                    output_dir
+                    str(output_dir)
                 ],
                 check=True,
                 stdout=subprocess.PIPE,
@@ -187,7 +184,7 @@ class PDFLoader(BaseLoader):
 
             # Expected PDF output path.
             pdf_name = os.path.splitext(file_name)[0] + ".pdf"
-            pdf_path = os.path.join( output_dir, pdf_name)
+            pdf_path = output_dir / pdf_name
 
             # Verify that the conversion actually
             # produced a PDF file.
@@ -207,4 +204,4 @@ class PDFLoader(BaseLoader):
             raise RuntimeError(
                 "Failed to convert document to PDF: "
                 f"{e.stderr.decode(errors='ignore')}"
-            )
+            ) from e

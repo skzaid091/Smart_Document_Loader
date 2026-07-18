@@ -195,7 +195,7 @@ class Document:
     document_id: str
     document_type: str
 
-    file_name: str
+    file_path: str
 
     page_count: int
     pages: List[PageContent]

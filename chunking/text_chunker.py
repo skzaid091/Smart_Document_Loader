@@ -30,7 +30,7 @@ class TextChunker:
         self.current_section = None
 
 
-    def process(self, element, section, document_id, document_name):
+    def process(self, element, section, document_id, document_path):
         """
         Process a text element.
 
@@ -48,7 +48,7 @@ class TextChunker:
         # Detect section change.
         if self.current_section is not section:
 
-            emitted_chunks.extend(self.flush(document_id=document_id, document_name=document_name))
+            emitted_chunks.extend(self.flush(document_id=document_id, document_path=document_path))
 
             self.current_section = (section)
 
@@ -62,7 +62,7 @@ class TextChunker:
         # exceeding target size.
         if (self.current_word_count + word_count > self.target_chunk_size):
 
-            emitted_chunks.extend(self._emit_chunk(document_id=document_id, document_name=document_name))
+            emitted_chunks.extend(self._emit_chunk(document_id=document_id, document_path=document_path))
 
             if self.current_page_number is None:
                 self.current_page_number = element.page_number
@@ -74,7 +74,7 @@ class TextChunker:
         return emitted_chunks
 
 
-    def flush(self, document_id, document_name):
+    def flush(self, document_id, document_path):
         """
         Flush pending text.
 
@@ -88,10 +88,10 @@ class TextChunker:
             List[DocumentChunk]
         """
 
-        return self._emit_chunk(document_id=document_id, document_name=document_name, force=True)
+        return self._emit_chunk(document_id=document_id, document_path=document_path, force=True)
 
 
-    def _emit_chunk(self, document_id=None, document_name=None, force=False):
+    def _emit_chunk(self, document_id=None, document_path=None, force=False):
         """
         Create a chunk from the
         accumulated text.
@@ -118,7 +118,7 @@ class TextChunker:
                 "chunk_index": -1,
 
                 # Source citation
-                "source": document_name,
+                "source": document_path,
                 "page_number": self.current_page_number,
                 "section_title": self.current_section["title"],
 

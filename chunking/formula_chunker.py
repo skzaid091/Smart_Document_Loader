@@ -55,7 +55,7 @@ class FormulaChunker:
         return "\n\n".join(parts)
 
 
-    def process(self, element, section, document_id, document_name):
+    def process(self, element, section, document_id, document_path):
         """
         Convert a formula element into a LangChain document.
 
@@ -89,7 +89,7 @@ class FormulaChunker:
                 "chunk_index": -1,
 
                 # Source citation
-                "source": document_name,
+                "source": document_path,
                 "page_number": element.page_number,
                 "section_title": section["title"],
 

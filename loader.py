@@ -91,7 +91,8 @@ class SmartDocumentLoader(Runnable[str, list]):
 
     def __init__(
             self, 
-            groq_api_key="", 
+            groq_api_key,
+            documents_dir, 
             ocr_config=None, 
             target_chunk_size=None, 
             min_chunk_size=None, 
@@ -118,26 +119,28 @@ class SmartDocumentLoader(Runnable[str, list]):
         download_prerequisites()
 
         # ------------------------------------------------------------------
+        # Documents Storage.
+        # ------------------------------------------------------------------
+        self.documents_dir = documents_dir
+
+        # ------------------------------------------------------------------
         # Workspace
         # ------------------------------------------------------------------
-
-        self.workspace = Workspace(BASE_DIR)
+        self.workspace = Workspace(BASE_DIR, self.documents_dir)
 
         # ------------------------------------------------------------------
         # Document Loaders
         # ------------------------------------------------------------------
-
         self.pdf_loader = PDFLoader(self.workspace)
         self.image_loader = ImageLoader(self.workspace)
 
-        self.structured_loader = StructuredLoader()
-        self.text_loader = TextLoader()
+        self.structured_loader = StructuredLoader(self.workspace)
+        self.text_loader = TextLoader(self.workspace)
         self.archive_loader = ArchiveLoader()
 
         # ------------------------------------------------------------------
         # Language Models
         # ------------------------------------------------------------------
-
         self.llm_service = LLMService(
             CONFIG["language_models"]["llm"],
             groq_api_key
@@ -151,7 +154,6 @@ class SmartDocumentLoader(Runnable[str, list]):
         # ------------------------------------------------------------------
         # Processing Components
         # ------------------------------------------------------------------
-
         self.page_renderer = PageRenderer(self.workspace)
 
         self.layout_detector = LayoutDetector(
@@ -205,18 +207,17 @@ class SmartDocumentLoader(Runnable[str, list]):
         # ------------------------------------------------------------------
         # Custom Processing Pipeline
         # ------------------------------------------------------------------
-
         self.custom_pipeline_steps = [
             self.page_renderer.render,
             self.layout_detector.process,
             self.text_extractor.process,
-            self.element_cleaner.process,
-            self.figure_extractor.process,
-            self.table_extractor.process,
-            self.formula_extractor.process,
-            self.document_cleaner.process,
-            self.section_builder.process,
-            self.chunk_builder.process,
+            # self.element_cleaner.process,
+            # self.figure_extractor.process,
+            # self.table_extractor.process,
+            # self.formula_extractor.process,
+            # self.document_cleaner.process,
+            # self.section_builder.process,
+            # self.chunk_builder.process,
         ]
 
 
@@ -283,7 +284,7 @@ class SmartDocumentLoader(Runnable[str, list]):
 
         elif extension in CONFIG["document_types"]["office"]:
             path = self.pdf_loader.convert_to_pdf(path)
-            document = self.pdf_loader.load(path)
+            document = self.pdf_loader.load(path, converted_file=True)
 
         elif extension in CONFIG["document_types"]["images"]:
             document = self.image_loader.load(path)
@@ -312,11 +313,11 @@ class SmartDocumentLoader(Runnable[str, list]):
         """
         Execute the custom multimodal document understanding pipeline.
         """
-
+        
         for step in self.custom_pipeline_steps:
             document = step(document)
         
-        self.clean_up(document)
+        # self.clean_up(document)
 
         return document
 

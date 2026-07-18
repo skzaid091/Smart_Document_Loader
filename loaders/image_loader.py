@@ -10,6 +10,7 @@ from .base_loader import BaseLoader
 class ImageLoader(BaseLoader):
 
     def __init__(self, workspace):
+
         self.workspace = workspace
 
 
@@ -18,8 +19,8 @@ class ImageLoader(BaseLoader):
         Load an image file and return it as a single-page Document.
         """
 
-        file_name = os.path.basename(path)
-        document_id, path = self.workspace.create(path)
+        path = self.worksapce.save_document(path)
+        document_id = self.workspace.create()
 
         try:
             # Read image metadata.
@@ -30,7 +31,6 @@ class ImageLoader(BaseLoader):
                 metadata = {
                     "format": image.format,
                     "mode": image.mode,
-                    "file_path": path
                 }
 
             # Represent the image as a single document page.
@@ -50,7 +50,7 @@ class ImageLoader(BaseLoader):
                 document_id=document_id,
                 document_type="image",
 
-                file_name=file_name,
+                file_path=path,
                 metadata=metadata,
 
                 page_count=1,
@@ -66,7 +66,7 @@ class ImageLoader(BaseLoader):
                 document_id=document_id,
                 document_type="image",
 
-                file_name=file_name,
+                file_path=path,
                 metadata={},
 
                 page_count=0,

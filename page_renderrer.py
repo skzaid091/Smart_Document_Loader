@@ -75,7 +75,7 @@ class PageRenderer:
 
         matrix = pymupdf.Matrix(zoom, zoom)
 
-        with pymupdf.open(document.metadata["file_path"]) as pdf:
+        with pymupdf.open(document.file_path) as pdf:
 
             for page in pdf:
 

@@ -104,7 +104,7 @@ CONFIG = {
     "language_models": {
 
         # Vision-Language Model.
-        "vlm": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "vlm": "qwen/qwen3.6-27b",
 
         # Large Language Model.
         "llm": "llama-3.3-70b-versatile"

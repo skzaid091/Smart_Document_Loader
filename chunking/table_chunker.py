@@ -17,7 +17,7 @@ class TableChunker:
         self.table_no = 1
 
 
-    def process(self, element, section, document_id, document_name):
+    def process(self, element, section, document_id, document_path):
         """
         Create a chunk from a table element.
 
@@ -51,7 +51,7 @@ class TableChunker:
                 "chunk_index": -1,
 
                 # Source citation
-                "source": document_name,
+                "source": document_path,
                 "page_number": element.page_number,
                 "section_title": section["title"],
 

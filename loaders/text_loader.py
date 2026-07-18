@@ -14,9 +14,14 @@ class TextLoader(BaseLoader):
     Wrapper around LangChain loaders for plain text documents.
     """
 
+    def __init__(self, workspace):
+        
+        self.worksapce = workspace
+
+
     def load(self, path):
 
-        path = Path(path)
+        path = self.worksapce.save_document(path)
         extension = path.suffix.lower()
 
         if extension == ".txt":

@@ -17,7 +17,7 @@ class FigureChunker:
         self.figure_no = 1
 
 
-    def process(self, element, section, document_id, document_name):
+    def process(self, element, section, document_id, document_path):
         """
         Create a chunk from a figure element.
 
@@ -46,7 +46,7 @@ class FigureChunker:
                 "chunk_index": -1,
 
                 # Source citation
-                "source": document_name,
+                "source": document_path,
                 "page_number": element.page_number,
                 "section_title": section["title"],
 

@@ -30,7 +30,7 @@ class ChunkBuilder:
 
         chunks = []
         document_id = document.document_id
-        document_name = document.file_name
+        document_path = document.file_path
 
         for section in document.sections:
 
@@ -38,31 +38,31 @@ class ChunkBuilder:
 
                 if element.element_type == "plain text":
                     chunks.extend(
-                        self.text_chunker.process(element, section, document_id, document_name)
+                        self.text_chunker.process(element, section, document_id, document_path)
                     )
 
                 elif element.element_type == "table":
 
-                    chunks.extend(self.text_chunker.flush(document_id, document_name))
+                    chunks.extend(self.text_chunker.flush(document_id, document_path))
                     chunks.extend(
-                        self.table_chunker.process(element, section, document_id, document_name)
+                        self.table_chunker.process(element, section, document_id, document_path)
                     )
 
                 elif element.element_type == "figure":
-                    chunks.extend(self.text_chunker.flush(document_id, document_name))
+                    chunks.extend(self.text_chunker.flush(document_id, document_path))
                     chunks.extend(
-                        self.figure_chunker.process(element, section, document_id, document_name)
+                        self.figure_chunker.process(element, section, document_id, document_path)
                     )
 
                 elif element.element_type in ["isolate_formula", "formula"]:
-                    chunks.extend(self.text_chunker.flush(document_id, document_name))
+                    chunks.extend(self.text_chunker.flush(document_id, document_path))
                     chunks.extend(
-                        self.formula_chunker.process(element, section, document_id, document_name)
+                        self.formula_chunker.process(element, section, document_id, document_path)
                     )
             
         # Final flush for remaining text
         chunks.extend(
-            self.text_chunker.flush(document_id, document_name)
+            self.text_chunker.flush(document_id, document_path)
         )
 
         for index, chunk in enumerate(chunks):
