@@ -28,7 +28,8 @@ load_dotenv()
 # image captioning, chunking strategy, and more.
 # ---------------------------------------------------------------------
 loader = SmartDocumentLoader(
-    groq_api_key=os.getenv("GROQ_API_KEY")
+    groq_api_key=os.getenv("GROQ_API_KEY"), 
+    documents_dir="<path_to_save_documents>"
 )
 
 # ---------------------------------------------------------------------
