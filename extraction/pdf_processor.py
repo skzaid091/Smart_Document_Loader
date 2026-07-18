@@ -1,4 +1,5 @@
 from .ocr_correction.ocr_text_correction import TextLLMCorrector
+from ..data_models import DocumentElement
 
 class PDFTextExtractor:
     """
@@ -78,59 +79,130 @@ class PDFTextExtractor:
         ]
 
 
-    def extract(self, element, page):
+    def _assign_text_blocks(self, page, page_elements):
         """
-        Extract text belonging to a layout element.
+        Assign every PyMuPDF text block to the layout element
+        with the highest overlap.
 
-        A text block is assigned to an element when
-        more than 50% of the block lies inside the
-        element's bounding box.
+        Returns
+        -------
+        tuple
+            (
+                assignments,
+                unmatched_blocks
+            )
+
+        assignments:
+            {
+                element_index: [
+                    {
+                        "bbox": [...],
+                        "text": "...",
+                        "y": ...
+                    },
+                    ...
+                ]
+            }
+
+        unmatched_blocks:
+            [
+                {
+                    "bbox": [...],
+                    "text": "...",
+                    "y": ...
+                }
+            ]
         """
 
-        matched_blocks = []
+        MIN_OVERLAP = 0.10
+
+        assignments = {
+            idx: []
+            for idx, element in enumerate(page_elements)
+            if element.element_type in self.text_element_types
+        }
+
+        unmatched_blocks = []
 
         for block in page.text_blocks:
 
-            scaled_bbox = self._scale_bbox(block["bbox"], page)
+            scaled_bbox = self._scale_bbox(
+                block["bbox"],
+                page
+            )
 
-            overlap = self._overlap_ratio(element.bbox, scaled_bbox)
-            if overlap > 0.5:
+            best_overlap = 0.0
+            best_element_idx = None
 
-                matched_blocks.append(
-                    (
-                        scaled_bbox[1],
-                        block["text"]
-                    )
+            for idx, element in enumerate(page_elements):
+
+                if element.element_type not in self.text_element_types:
+                    continue
+
+                overlap = self._overlap_ratio(
+                    element.bbox,
+                    scaled_bbox,
                 )
 
-        # Preserve top-to-bottom reading order.
-        matched_blocks.sort(key=lambda item: item[0])
+                if overlap > best_overlap:
+                    best_overlap = overlap
+                    best_element_idx = idx
 
-        return "\n".join(text for _, text in matched_blocks)
+            block_data = {
+                "bbox": scaled_bbox,
+                "text": block["text"],
+                "y": scaled_bbox[1],
+            }
+
+            if (best_element_idx is not None and best_overlap >= MIN_OVERLAP):
+                assignments[best_element_idx].append(block_data)
+
+            else:
+                unmatched_blocks.append(block_data)
+
+        return assignments, unmatched_blocks
 
 
     def process_page(self, document, page):
-        """
-        Populate text content for all text-based
-        layout elements on a page.
-        """
 
         page_elements = [
             element
             for element in document.elements
-            if (
-                element.page_number == page.page_number
-            )
+            if element.page_number == page.page_number
         ]
 
-        for element in page_elements:
+        assignments, unmatched_blocks = self._assign_text_blocks(
+            page,
+            page_elements,
+        )
 
-            # Skip non-textual elements such as
-            # tables, figures, and images.
-            if (element.element_type not in self.text_element_types):
+        for idx, element in enumerate(page_elements):
+
+            if element.element_type not in self.text_element_types:
                 continue
 
-            element.text = self.extract(element, page)
+            matched_blocks = assignments[idx]
 
+            matched_blocks.sort(
+                key=lambda block: block["y"]
+            )
+
+            element.text = "\n".join(
+                block["text"]
+                for block in matched_blocks
+            )
+
+        for block in unmatched_blocks:
+
+            document.elements.append(
+                DocumentElement(
+                    page_number=page.page_number,
+                    element_type="plain text",
+                    confidence=1.0,
+                    bbox=block["bbox"],
+                    text=block["text"],
+                    metadata={}
+                )
+            )
 
         return document

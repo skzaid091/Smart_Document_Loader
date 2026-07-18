@@ -211,13 +211,13 @@ class SmartDocumentLoader(Runnable[str, list]):
             self.page_renderer.render,
             self.layout_detector.process,
             self.text_extractor.process,
-            # self.element_cleaner.process,
-            # self.figure_extractor.process,
-            # self.table_extractor.process,
-            # self.formula_extractor.process,
-            # self.document_cleaner.process,
-            # self.section_builder.process,
-            # self.chunk_builder.process,
+            self.element_cleaner.process,
+            self.figure_extractor.process,
+            self.table_extractor.process,
+            self.formula_extractor.process,
+            self.document_cleaner.process,
+            self.section_builder.process,
+            self.chunk_builder.process,
         ]
 
 
