@@ -317,7 +317,7 @@ class SmartDocumentLoader(Runnable[str, list]):
         for step in self.custom_pipeline_steps:
             document = step(document)
         
-        # self.clean_up(document)
+        self.clean_up(document)
 
         return document
 
