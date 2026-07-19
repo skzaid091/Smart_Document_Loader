@@ -89,7 +89,7 @@ class FormulaChunker:
                 "chunk_index": -1,
 
                 # Source citation
-                "source": document_path,
+                "source": str(document_path),
                 "page_number": element.page_number,
                 "section_title": section["title"],
 

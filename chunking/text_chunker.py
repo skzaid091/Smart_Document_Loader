@@ -118,7 +118,7 @@ class TextChunker:
                 "chunk_index": -1,
 
                 # Source citation
-                "source": document_path,
+                "source": str(document_path),
                 "page_number": self.current_page_number,
                 "section_title": self.current_section["title"],
 

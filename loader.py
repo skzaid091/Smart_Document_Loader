@@ -17,8 +17,8 @@ from .loaders.archive_loader import ArchiveLoader
 # ---------------------------------------------------------------------
 # Language Models
 # ---------------------------------------------------------------------
-from .language_models.llm_service import LLMService
-from .language_models.vlm_service import VLM_Service
+from .language_models.llm.llm_service import LLM_Service
+from .language_models.vlm.vlm_service import VLM_Service
 
 # ---------------------------------------------------------------------
 # Processing Components
@@ -91,8 +91,9 @@ class SmartDocumentLoader(Runnable[str, list]):
 
     def __init__(
             self, 
-            groq_api_key,
-            documents_dir, 
+            llm_config,  
+            vlm_config, 
+            documents_dir,
             ocr_config=None, 
             target_chunk_size=None, 
             min_chunk_size=None, 
@@ -141,14 +142,14 @@ class SmartDocumentLoader(Runnable[str, list]):
         # ------------------------------------------------------------------
         # Language Models
         # ------------------------------------------------------------------
-        self.llm_service = LLMService(
-            CONFIG["language_models"]["llm"],
-            groq_api_key
+        self.llm_service = LLM_Service.create(
+            llm_config, 
+            CONFIG["language_models"]["llm"]
         )
 
-        self.vlm_service = VLM_Service(
-            CONFIG["language_models"]["vlm"],
-            groq_api_key
+        self.vlm_service = VLM_Service.create(
+            vlm_config, 
+            CONFIG["language_models"]["vlm"]
         )
 
         # ------------------------------------------------------------------

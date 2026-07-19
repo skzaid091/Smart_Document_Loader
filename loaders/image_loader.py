@@ -19,7 +19,7 @@ class ImageLoader(BaseLoader):
         Load an image file and return it as a single-page Document.
         """
 
-        path = self.worksapce.save_document(path)
+        path = self.workspace.save_document(path)
         document_id = self.workspace.create()
 
         try:

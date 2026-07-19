@@ -1,63 +1,95 @@
 """
 Example: Using SmartDocumentLoader
 
-This example demonstrates the basic usage of SmartDocumentLoader
-to process a document and obtain LangChain Document chunks that
-can be directly used for RAG pipelines, vector stores, or other
-downstream applications.
+This example demonstrates how to process a document using
+SmartDocumentLoader and generate LangChain Document chunks
+that can be used in Retrieval-Augmented Generation (RAG)
+pipelines, vector databases, or other downstream applications.
 """
-
-import os
-from dotenv import load_dotenv
 
 from Smart_Document_Loader.loader import SmartDocumentLoader
 
-# ---------------------------------------------------------------------
-# Load environment variables (e.g., GROQ_API_KEY) from the .env file.
-# ---------------------------------------------------------------------
-load_dotenv()
 
 # ---------------------------------------------------------------------
-# Initialize the SmartDocumentLoader.
+# Initialize the document loader.
 #
-# Required:
-#   - groq_api_key: API key used for LLM/VLM-based extraction tasks.
+# Parameters
+# ----------
+# llm_config : dict
+#     Configuration for the language model used by the loader.
 #
-# Optional configuration parameters (not shown here) can be used to
-# customize OCR, layout detection, table extraction, formula extraction,
-# image captioning, chunking strategy, and more.
+# vlm_config : dict
+#     Configuration for the vision-language model used for
+#     figure understanding and formula extraction.
+#
+# documents_dir : str
+#     Directory where extracted document assets such as cropped
+#     figures, tables, and formulas will be stored.
 # ---------------------------------------------------------------------
 loader = SmartDocumentLoader(
-    groq_api_key=os.getenv("GROQ_API_KEY"), 
-    documents_dir="<path_to_save_documents>"
+
+    llm_config={
+        "provider": "groq",
+        "api_key": "<GROQ_API_KEY>",
+    },
+
+    vlm_config={
+        "provider": "gemini",
+        "api_key": "<GOOGLE_API_KEY>",
+    },
+
+    documents_dir="./documents",
 )
 
+
 # ---------------------------------------------------------------------
-# Path to the document that needs to be processed.
+# Path to the input document.
 #
-# Supported formats include PDFs, images, Word documents, PowerPoint,
-# Excel, text files, and other supported document types.
+# Supported formats include:
+#
+# - PDF
+# - Images
+# - Microsoft Word
+# - PowerPoint
+# - Excel
+# - HTML
+# - Markdown
+# - CSV
+# - JSON
+# - XML
+# - Text
 # ---------------------------------------------------------------------
-pdf_path = "/<path_to_file>/attention_is_all_you_need_Paper.pdf"
+document_path = "examples/documents/attention_is_all_you_need_Paper.pdf"
+
 
 # ---------------------------------------------------------------------
 # Process the document.
 #
-# invoke() performs the complete document understanding pipeline:
+# The document understanding pipeline includes:
 #
 #   1. Document loading
-#   2. Layout detection
-#   3. OCR (if required)
-#   4. Reading order reconstruction
-#   5. Table extraction
-#   6. Formula extraction
-#   7. Figure processing
-#   8. Metadata generation
-#   9. Chunk creation
+#   2. Office-to-PDF conversion (if required)
+#   3. Layout detection
+#   4. OCR
+#   5. Reading-order reconstruction
+#   6. Table extraction
+#   7. Figure understanding
+#   8. Formula extraction
+#   9. Metadata generation
+#  10. Semantic chunk creation
 #
-# Returns:
-#     List[langchain_core.documents.Document]
+# Returns
+# -------
+# List[langchain_core.documents.Document]
 # ---------------------------------------------------------------------
-document_chunks = loader.invoke(pdf_path)
+document_chunks = loader.invoke(document_path)
 
-print(f"Successfully generated {len(document_chunks)} document chunks.")
+print(f"Generated {len(document_chunks)} document chunks.")
+
+for chunk in document_chunks:
+
+    print("=" * 80)
+    print(f"Chunk Type : {chunk.metadata['chunk_type']}")
+    print(f"Page       : {chunk.metadata['page_number']}")
+    print(chunk.page_content)
+    print()

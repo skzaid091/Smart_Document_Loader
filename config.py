@@ -103,11 +103,38 @@ CONFIG = {
     # -------------------------------------------------------------------------
     "language_models": {
 
-        # Vision-Language Model.
-        "vlm": "qwen/qwen3.6-27b",
+        # Vision-Language Models
+        "vlm": {
 
-        # Large Language Model.
-        "llm": "llama-3.3-70b-versatile"
+            "groq": {
+                "provider": "groq",
+                "model": "llama-3.3-70b-versatile"
+            },
+
+            "huggingface": {
+                "provider": "featherless-ai",
+                "model": "Qwen/Qwen2.5-VL-3B-Instruct"
+            }, 
+
+            "gemini": {
+                "provider": "google",
+                "model": "gemini-3.5-flash"
+            }
+        },
+
+        # Large Language Models
+        "llm": {
+
+            "groq": {
+                "provider": "groq",
+                "model": "llama-3.3-70b-versatile"
+            },
+
+            "huggingface": {
+                "provider": "featherless-ai",
+                "model": "Qwen/Qwen2.5-7B-Instruct"
+            }
+        }
     },
 
     # -------------------------------------------------------------------------
