@@ -1,5 +1,7 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any, List, Dict, Optional
 
 
 # ==========================================================
@@ -223,3 +225,28 @@ class Document:
         Retrieve a page using 1-based indexing.
         """
         return self.pages[page_number - 1]
+
+
+# ==========================================================
+# Document Metadata
+# ==========================================================
+IST = ZoneInfo("Asia/Kolkata")
+
+@dataclass
+class DocumentMetadata:
+    """
+    Metadata describing a processed document.
+    """
+
+    document_id: str
+    document_name: str
+
+    chunks_count: int
+    chunks_path: str
+
+    source_path: Optional[str] = None
+    source_type: Optional[str] = None
+
+    file_size: Optional[int] = None
+
+    created_at: datetime = field(default_factory=lambda: datetime.now(IST))

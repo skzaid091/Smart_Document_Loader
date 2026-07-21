@@ -40,4 +40,4 @@ class StructuredLoader(BaseLoader):
         else:
             raise ValueError(f"Unsupported structured document: {extension}")
 
-        return loader.load()
+        return path, loader.load()

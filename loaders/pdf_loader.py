@@ -61,7 +61,7 @@ class PDFLoader(BaseLoader):
                         )
                     )
 
-                return Document(
+                return path, Document(
                     document_id=document_id,
                     document_type="pdf",
 
@@ -77,7 +77,7 @@ class PDFLoader(BaseLoader):
 
         except Exception as e:
 
-            return Document(
+            return None, Document(
                 document_id=document_id,
                 document_type="pdf",
 
@@ -161,7 +161,7 @@ class PDFLoader(BaseLoader):
             raise FileNotFoundError(f"File not found: {file_path}")
 
         file_name = os.path.basename(file_path)
-        output_dir = self.workspace.documents_dir
+        output_dir = self.workspace.raw_documents_dir
 
         try:
 

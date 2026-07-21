@@ -21,7 +21,7 @@ class Workspace:
             └── ...
     """
 
-    def __init__(self, base_dir, documents_dir, root_dir="temp"):
+    def __init__(self, base_dir, raw_documents_dir, root_dir="temp"):
         """
         Initialize the workspace manager.
 
@@ -30,7 +30,7 @@ class Workspace:
         base_dir : str or Path
             Base directory used to store temporary processing workspaces.
 
-        documents_dir : str or Path
+        raw_documents_dir : str or Path
             Directory where copies of the original source documents are
             stored. Relative paths are resolved against the current working
             directory, while absolute paths are used as-is.
@@ -44,15 +44,15 @@ class Workspace:
         self.root_dir = Path(base_dir) / root_dir
         self.root_dir.mkdir(parents=True, exist_ok=True)
 
-        self.documents_dir = Path(documents_dir)
+        self.raw_documents_dir = Path(raw_documents_dir)
         
         # Resolve relative paths against the current working directory.
-        if not self.documents_dir.is_absolute():
-            self.documents_dir = Path.cwd() / self.documents_dir
+        if not self.raw_documents_dir.is_absolute():
+            self.raw_documents_dir = Path.cwd() / self.raw_documents_dir
 
         # Convert to a canonical absolute path and create the directory.
-        self.documents_dir = self.documents_dir.resolve()
-        self.documents_dir.mkdir(parents=True, exist_ok=True)
+        self.raw_documents_dir = self.raw_documents_dir.resolve()
+        self.raw_documents_dir.mkdir(parents=True, exist_ok=True)
     
 
     def save_document(self, path):
@@ -71,7 +71,7 @@ class Workspace:
         """
         path = Path(path)
 
-        destination = self.documents_dir / path.name
+        destination = self.raw_documents_dir / path.name
 
         shutil.copy2(path, destination)
 

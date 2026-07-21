@@ -120,7 +120,7 @@ class TextChunker:
                 # Source citation
                 "source": str(document_path),
                 "page_number": self.current_page_number,
-                "section_title": self.current_section["title"],
+                "section_title": self.current_section["title"] if self.current_section["title"] != "Untitled Section" else "",
 
                 # Chunk information
                 "chunk_type": "text",

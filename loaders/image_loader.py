@@ -46,7 +46,7 @@ class ImageLoader(BaseLoader):
                 image_path=path
             )
 
-            return Document(
+            return path, Document(
                 document_id=document_id,
                 document_type="image",
 
@@ -62,7 +62,7 @@ class ImageLoader(BaseLoader):
         except Exception as e:
 
             # Return a valid Document containing error details.
-            return Document(
+            return None, Document(
                 document_id=document_id,
                 document_type="image",
 

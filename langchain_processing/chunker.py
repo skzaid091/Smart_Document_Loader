@@ -26,7 +26,7 @@ class LangChainChunker:
         )
 
 
-    def process(self, documents):
+    def process(self, document):
         """
         Split LangChain Documents into chunks.
 
@@ -39,11 +39,13 @@ class LangChainChunker:
         list[Document]
         """
         
-        chunks = self.text_splitter.split_documents(documents)
+        chunks = self.text_splitter.split_documents(document)
+        document_id = str(uuid4()).split("-")[-1]
 
         for index, chunk in enumerate(chunks):
-
+            
+            chunk.metadata["document_id"] = document_id
             chunk.metadata["chunk_id"] = str(uuid4()).split("-")[-1]
             chunk.metadata["chunk_index"] = index
 
-        return chunks
+        return document_id, chunks

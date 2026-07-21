@@ -42,6 +42,19 @@ from .langchain_processing.chunker import LangChainChunker
 
 from .workspace import Workspace
 
+# ---------------------------------------------------------------------
+# Storage
+# ---------------------------------------------------------------------
+from .metadata_store.factory import MetadataStoreFactory
+from .chunk_store.factory import ChunkStoreFactory
+
+# ---------------------------------------------------------------------
+# Utilities
+# ---------------------------------------------------------------------
+from .utils import (
+    generate_document_metadata
+)
+
 
 class SmartDocumentLoader(Runnable[str, list]):
     """
@@ -91,13 +104,13 @@ class SmartDocumentLoader(Runnable[str, list]):
 
     def __init__(
             self, 
-            llm_config,  
+            llm_config, 
             vlm_config, 
-            documents_dir,
+            storage, 
             ocr_config=None, 
             target_chunk_size=None, 
             min_chunk_size=None, 
-            overlap_size=None,
+            overlap_size=None
         ):
         """
         Initialize the Smart Document Loader.
@@ -122,12 +135,18 @@ class SmartDocumentLoader(Runnable[str, list]):
         # ------------------------------------------------------------------
         # Documents Storage.
         # ------------------------------------------------------------------
-        self.documents_dir = documents_dir
+        self.raw_documents_dir = f"{storage['root']}/{storage['raw_documents_dir']}"
 
         # ------------------------------------------------------------------
         # Workspace
         # ------------------------------------------------------------------
-        self.workspace = Workspace(BASE_DIR, self.documents_dir)
+        self.workspace = Workspace(BASE_DIR, self.raw_documents_dir)
+
+        # ------------------------------------------------------------------
+        # Storage (Metadata and Chunks)
+        # ------------------------------------------------------------------
+        self.metadata_store = MetadataStoreFactory.create(storage["root"], storage["metadata"])
+        self.chunk_store = ChunkStoreFactory.create(storage["root"], storage["chunks"])
 
         # ------------------------------------------------------------------
         # Document Loaders
@@ -281,23 +300,23 @@ class SmartDocumentLoader(Runnable[str, list]):
         extension = path.suffix.lower()
 
         if extension in CONFIG["document_types"]["pdf"]:
-            document = self.pdf_loader.load(path)
+            raw_path, document = self.pdf_loader.load(path)
 
         elif extension in CONFIG["document_types"]["office"]:
             path = self.pdf_loader.convert_to_pdf(path)
-            document = self.pdf_loader.load(path, converted_file=True)
+            raw_path, document = self.pdf_loader.load(path, converted_file=True)
 
         elif extension in CONFIG["document_types"]["images"]:
-            document = self.image_loader.load(path)
+            raw_path, document = self.image_loader.load(path)
 
         elif extension in CONFIG["document_types"]["structured"]:
-            document = self.structured_loader.load(path)
+            raw_path, document = self.structured_loader.load(path)
 
         elif extension in CONFIG["document_types"]["text"]:
-            document = self.text_loader.load(path)
+            raw_path, document = self.text_loader.load(path)
 
         elif extension in CONFIG["document_types"]["archives"]:
-            document = self.archive_loader.load(path)
+            raw_path, document = self.archive_loader.load(path)
 
         else:
             raise ValueError(
@@ -305,9 +324,16 @@ class SmartDocumentLoader(Runnable[str, list]):
             )
 
         if extension in CONFIG["document_types"]["custom"]:
-            return self.custom_pipeline(document)
+            document_id, document_chunks = self.custom_pipeline(document)
+        
+        else:
+            document_id, document_chunks = self.langchain_pipeline(document)
 
-        return self.langchain_pipeline(document)
+        chunks_path = self.chunk_store.save(document_id, document_chunks)
+        document_metadata = generate_document_metadata(raw_path, document_id, document_chunks, chunks_path)
+        self.metadata_store.save(document_metadata)
+
+        return document_id, document_chunks
 
 
     def custom_pipeline(self, document):
@@ -318,9 +344,11 @@ class SmartDocumentLoader(Runnable[str, list]):
         for step in self.custom_pipeline_steps:
             document = step(document)
         
+        document_id = document[0].metadata["document_id"]
+        
         self.clean_up(document)
 
-        return document
+        return document_id, document
 
 
     def langchain_pipeline(self, documents):

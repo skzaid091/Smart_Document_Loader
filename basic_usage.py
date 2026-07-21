@@ -22,9 +22,9 @@ from Smart_Document_Loader.loader import SmartDocumentLoader
 #     Configuration for the vision-language model used for
 #     figure understanding and formula extraction.
 #
-# documents_dir : str
-#     Directory where extracted document assets such as cropped
-#     figures, tables, and formulas will be stored.
+# storage : dict
+#     Configuration for storing raw documents, processed chunks,
+#     and document metadata.
 # ---------------------------------------------------------------------
 loader = SmartDocumentLoader(
 
@@ -38,7 +38,28 @@ loader = SmartDocumentLoader(
         "api_key": "<GOOGLE_API_KEY>",
     },
 
-    documents_dir="./documents",
+    storage={
+
+        # Root storage directory.
+        "root": "./storage",
+
+        # Directory where original documents are stored.
+        "raw_documents_dir": "raw_documents",
+
+        # Metadata storage configuration.
+        "metadata": {
+            "type": "mongodb",
+            "uri": "mongodb://localhost:27017",
+            "database": "documents",
+            "collection": "metadata",
+        },
+
+        # Chunk storage configuration.
+        "chunks": {
+            "type": "filesystem",
+            "output_directory": "processed_documents",
+        },
+    },
 )
 
 
@@ -77,6 +98,8 @@ document_path = "examples/documents/attention_is_all_you_need_Paper.pdf"
 #   8. Formula extraction
 #   9. Metadata generation
 #  10. Semantic chunk creation
+#  11. Chunk persistence
+#  12. Metadata persistence
 #
 # Returns
 # -------
@@ -91,5 +114,11 @@ for chunk in document_chunks:
     print("=" * 80)
     print(f"Chunk Type : {chunk.metadata['chunk_type']}")
     print(f"Page       : {chunk.metadata['page_number']}")
+
+    section_title = chunk.metadata.get("section_title", "")
+    if section_title:
+        print(f"Section    : {section_title}")
+
+    print()
     print(chunk.page_content)
     print()

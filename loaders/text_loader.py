@@ -36,4 +36,4 @@ class TextLoader(BaseLoader):
         else:
             raise ValueError(f"Unsupported text document: {extension}")
 
-        return loader.load()
+        return path, loader.load()
